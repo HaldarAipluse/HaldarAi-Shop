@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Store</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        :root {
+            --bg-color: #100a1f;
+            --primary-glow: rgba(92, 77, 255, 0.4);
+            --secondary-glow: rgba(74, 61, 153, 0.3);
+            --accent-color: #6a5acd;
+            --highlight-color: #f72585; /* Magenta for badges */
+            --text-color: #f0f0f0;
+            --text-color-muted: #a9a4b5;
+            --glass-bg: rgba(74, 61, 153, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --font-family: 'Poppins', sans-serif;
+            --header-height: 70px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 90% 10%, var(--primary-glow) 0%, transparent 40%),
+                radial-gradient(circle at 10% 90%, var(--secondary-glow) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: var(--header-height);
+        }
+
+        .glass-morphism {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        a { text-decoration: none; color: var(--accent-color); }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+        
+        .header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            height: var(--header-height);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 2rem; z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: #fff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-link { font-weight: 500; color: var(--text-color); transition: color 0.3s ease; }
+        .nav-link:hover { color: #fff; }
+        .header-icons { display: flex; align-items: center; gap: 1.5rem; }
+        .icon-link { position: relative; font-size: 1.2rem; color: var(--text-color); }
+        .badge { position: absolute; top: -8px; right: -10px; background-color: var(--highlight-color); color: #fff; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 600; }
+        
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .filters-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .search-bar, .sort-dropdown { padding: 0.6rem 1rem; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 1rem; background: rgba(0,0,0,0.2); color: var(--text-color); }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        
+        .product-card {
+            overflow: hidden; display: flex; flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .product-image { width: 100%; height: 200px; object-fit: cover; cursor: pointer; border-radius: 16px 16px 0 0; }
+        .product-info { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .product-price { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: auto; }
+        .product-actions { display: flex; gap: 0.5rem; margin-top: 1.5rem; }
+        
+        .btn { padding: 0.7rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-align: center; font-size: 0.9rem; }
+        .btn-solid { background-color: var(--accent-color); color: #fff; border: none; }
+        .btn-solid:hover { background-color: #7b68ee; transform: translateY(-3px); }
+        .btn-glass { background: var(--glass-bg); color: var(--text-color); border: 1px solid var(--glass-border); }
+        .btn-glass:hover { background: rgba(255,255,255,0.2); }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; z-index: 2000; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { padding: 2rem; width: 90%; max-width: 500px; position: relative; animation: scaleIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: #888; cursor: pointer; }
+        .auth-form-container { display: none; }
+        .auth-form-container.active { display: block; }
+        .form-title { text-align: center; margin-bottom: 1.5rem; font-size: 1.8rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input { width: 100%; padding: 0.8rem; border: 1px solid var(--glass-border); border-radius: 8px; background: rgba(0,0,0,0.2); color: var(--text-color); }
+        .form-switch { text-align: center; margin-top: 1.5rem; color: var(--text-color-muted); }
+        
+        #product-detail-modal .modal-content { max-width: 800px; display: flex; gap: 2rem; }
+        #product-detail-image { width: 50%; object-fit: cover; border-radius: 16px; }
+        #product-detail-info { width: 50%; }
+        
+        .cart-item { display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--glass-border); padding: 1rem 0; }
+        .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        
+        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; border-radius: 8px; color: #fff; z-index: 3000; transition: all 0.4s ease; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); }
+        .toast.show { bottom: 20px; }
+        .toast.success { background: rgba(40, 167, 69, 0.7); }
+        .toast.error { background: rgba(220, 53, 69, 0.7); }
+
+        .hidden { display: none !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+        .shake { animation: shake 0.4s ease-in-out; }
+
+        @media (max-width: 768px) { .nav-links { display: none; } .header { padding: 0 1rem; } #product-detail-modal .modal-content { flex-direction: column; } #product-detail-image, #product-detail-info { width: 100%; } }
+    </style>
+</head>
+<body>
+
+    <header class="header glass-morphism">
+        <a href="#home" class="logo">ShopifyLite</a>
+        <nav class="nav-links">
+            <a href="#home" class="nav-link">Home</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#contact" class="nav-link">Contact</a>
+            <a href="#orders" class="nav-link auth-required hidden">Orders</a>
+            <a href="#profile" class="nav-link auth-required hidden">Profile</a>
+        </nav>
+        <div class="header-icons">
+            <a href="#" id="login-nav-link" class="nav-link guest-only">Login</a>
+            <a href="#wishlist" class="icon-link"><i class="fas fa-heart"></i><span id="wishlist-badge" class="badge hidden">0</span></a>
+            <a href="#cart" class="icon-link"><i class="fas fa-shopping-cart"></i><span id="cart-badge" class="badge hidden">0</span></a>
+            <a href="#" id="logout-nav-link" class="nav-link auth-required hidden">Logout</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="page-home" class="page"><div class="container"><div class="filters-container"><input type="text" id="search-bar" class="search-bar" placeholder="Search for products..."><select id="sort-dropdown" class="sort-dropdown"><option value="default">Sort by</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="name-asc">Name: A to Z</option><option value="name-desc">Name: Z to A</option></select></div><div id="product-grid" class="product-grid"></div></div></section>
+        <section id="page-wishlist" class="page"><div class="container"><h2>My Wishlist</h2><div id="wishlist-grid" class="product-grid"></div></div></section>
+        <section id="page-cart" class="page"><div class="container"><h2>My Cart</h2><div id="cart-items-container"></div><div id="cart-summary" class="cart-summary glass-morphism hidden" style="padding: 1.5rem; margin-top:2rem;"><h3>Cart Summary</h3><p>Total: <span id="cart-total-price">$0.00</span></p><button id="checkout-btn" class="btn btn-solid" style="width:100%; margin-top:1rem;">Place Order</button></div></div></section>
+        <section id="page-orders" class="page"><div class="container"><h2>My Order History</h2><div id="orders-container"></div></div></section>
+        <section id="page-profile" class="page"><div class="container"><h2>My Profile</h2><div id="profile-info" class="glass-morphism" style="padding:1.5rem;"></div></div></section>
+        <section id="page-about" class="page"><div class="container glass-morphism" style="padding:1.5rem;"><h2>About Us</h2><p>Welcome to ShopifyLite, your number one source for all things amazing. We're dedicated to giving you the very best products, with a focus on quality, customer service, and uniqueness.</p><p>Founded in 2024, ShopifyLite has come a long way from its beginnings. We now serve customers all over the world, and are thrilled to be a part of the fair-trade wing of the e-commerce industry.</p></div></section>
+        <section id="page-contact" class="page"><div class="container glass-morphism" style="padding:1.5rem;"><h2>Contact Us</h2><p>Have a question? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p><form id="contact-form"><div class="form-group"><label for="contact-name">Name</label><input type="text" id="contact-name" required></div><div class="form-group"><label for="contact-email">Email</label><input type="email" id="contact-email" required></div><div class="form-group"><label for="contact-message">Message</label><textarea id="contact-message" rows="5" style="width:100%; padding: 0.8rem; border: 1px solid var(--glass-border); border-radius: 8px; background:rgba(0,0,0,0.2); color:var(--text-color);" required></textarea></div><button type="submit" class="btn btn-solid">Send Message</button></form></div></section>
+    </main>
+
+    <div id="auth-modal" class="modal">
+        <div class="modal-content glass-morphism">
+            <span class="modal-close">×</span>
+            <div id="login-form-container" class="auth-form-container active"><h2 class="form-title">Login</h2><form id="login-form"><div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-password">Password</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-solid" style="width: 100%;">Login</button></form><p class="form-switch">Don't have an account? <a href="#" id="show-register">Register</a></p></div>
+            <div id="register-form-container" class="auth-form-container"><h2 class="form-title">Register</h2><form id="register-form"><div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div><div class="form-group"><label for="register-password">Password (min. 6 characters)</label><input type="password" id="register-password" required></div><button type="submit" class="btn btn-solid" style="width: 100%;">Register</button></form><p class="form-switch">Already have an account? <a href="#" id="show-login">Login</a></p></div>
+        </div>
+    </div>
+    <div id="product-detail-modal" class="modal">
+        <div class="modal-content glass-morphism">
+            <span class="modal-close">×</span>
+            <img id="product-detail-image" src="" alt="Product Image"><div id="product-detail-info"><h2 id="product-detail-name"></h2><p id="product-detail-price" style="font-size: 1.5rem; color: #fff; font-weight: 700;"></p><p id="product-detail-description" style="color:var(--text-color-muted);"></p><p><strong>Stock:</strong> <span id="product-detail-stock"></span></p><div class="product-actions" style="margin-top: 2rem;"><button id="detail-add-to-cart-btn" class="btn btn-solid">Add to Cart</button><button id="detail-add-to-wishlist-btn" class="btn btn-glass">Add to Wishlist</button></div></div>
+        </div>
+    </div>
+    
+    <div id="toast-notification" class="toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, get, push, remove, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyC_0_H_Mo3pQZhD6ttmEKRE0YvZk-mDakU",
+          authDomain: "ecommerce-f3eb3.firebaseapp.com",
+          databaseURL: "https://ecommerce-f3eb3-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "ecommerce-f3eb3",
+          storageBucket: "ecommerce-f3eb3.appspot.com",
+          messagingSenderId: "553586434835",
+          appId: "1:553586434835:web:e0df448be4b076378ff0e6",
+          measurementId: "G-Q634DEXVS8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null; let products = []; let cart = []; let wishlist = [];
+        const pages = document.querySelectorAll('.page');
+        const authModal = document.getElementById('auth-modal');
+        const productDetailModal = document.getElementById('product-detail-modal');
+
+        const showToast = (message, type = 'success') => { const toast = document.getElementById('toast-notification'); toast.textContent = message; toast.className = `toast show ${type}`; setTimeout(() => { toast.className = 'toast'; }, 3000); };
+        const openModal = (modal) => modal.classList.add('active');
+        const closeModal = (modal) => modal.classList.remove('active');
+        const handleRouteChange = () => { const hash = window.location.hash || '#home'; pages.forEach(p => p.classList.toggle('active', `#${p.id.replace('page-', '')}` === hash)); switch(hash) { case '#wishlist': renderWishlist(); break; case '#cart': renderCart(); break; case '#orders': if (currentUser) fetchOrders(); break; case '#profile': if (currentUser) renderProfile(); break; } };
+        
+        const renderProducts = (productsToRender) => {
+            const grid = document.getElementById('product-grid'); grid.innerHTML = '';
+            if (!productsToRender || productsToRender.length === 0) { grid.innerHTML = '<p>No products found.</p>'; return; }
+            productsToRender.forEach(p => {
+                grid.innerHTML += `<div class="product-card glass-morphism" data-id="${p.id}"><img src="${p.imageUrl}" alt="${p.name}" class="product-image"><div class="product-info"><h3 class="product-name">${p.name}</h3><p class="product-price">$${p.price.toFixed(2)}</p><div class="product-actions"><button class="btn btn-solid add-to-cart-btn" data-id="${p.id}">Add to Cart</button><button class="btn btn-glass add-to-wishlist-btn" data-id="${p.id}"><i class="fas fa-heart"></i></button></div></div></div>`;
+            });
+        };
+        const renderWishlist = () => { const grid = document.getElementById('wishlist-grid'); grid.innerHTML = ''; if(wishlist.length === 0) { grid.innerHTML = '<p>Your wishlist is empty.</p>'; return; } const wishlistProducts = wishlist.map(item => products.find(p => p.id === item.productId)); wishlistProducts.forEach(product => { if(product) { grid.innerHTML += `<div class="product-card glass-morphism" data-id="${product.id}"><img src="${product.imageUrl}" alt="${product.name}" class="product-image"><div class="product-info"><h3 class="product-name">${product.name}</h3><p class="product-price">$${product.price.toFixed(2)}</p><div class="product-actions"><button class="btn btn-solid add-to-cart-btn" data-id="${product.id}">Move to Cart</button><button class="btn btn-glass remove-from-wishlist-btn" data-id="${product.id}">Remove</button></div></div></div>`; } }); };
+        const renderCart = () => { const container = document.getElementById('cart-items-container'); const summary = document.getElementById('cart-summary'); container.innerHTML = ''; if (cart.length === 0) { container.innerHTML = '<p>Your cart is empty.</p>'; summary.classList.add('hidden'); return; } summary.classList.remove('hidden'); let totalPrice = 0; cart.forEach(item => { const product = products.find(p => p.id === item.productId); if (product) { totalPrice += product.price * item.quantity; container.innerHTML += `<div class="cart-item" data-id="${product.id}"><img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img"><div class="cart-item-info"><h4>${product.name}</h4><p>$${product.price.toFixed(2)}</p></div><p>Qty: ${item.quantity}</p><button class="btn remove-from-cart-btn" style="background:none; border:none; color:var(--highlight-color); font-size:1.5rem;" data-id="${product.id}">×</button></div>`; } }); document.getElementById('cart-total-price').textContent = `$${totalPrice.toFixed(2)}`; };
+        const renderOrders = (orders) => { const container = document.getElementById('orders-container'); container.innerHTML = ''; if (!orders || Object.keys(orders).length === 0) { container.innerHTML = '<p>You have no past orders.</p>'; return; } Object.values(orders).reverse().forEach(order => { const orderDate = new Date(order.date).toLocaleDateString(); const itemsHtml = order.items.map(item => `<div class="order-item"><span>${item.name} (x${item.quantity})</span><span>$${(item.price * item.quantity).toFixed(2)}</span></div>`).join(''); container.innerHTML += `<div class="order-card glass-morphism" style="padding:1.5rem;"><div class="order-header"><span>Order ID: ${order.id.slice(-6)}</span><span>Date: ${orderDate}</span><span>Status: ${order.status}</span></div><div class="order-body">${itemsHtml}</div><div class="order-footer" style="text-align: right; font-weight: 700; margin-top: 1rem;">Total: $${order.total.toFixed(2)}</div></div>`; }); };
+        const renderProfile = () => { const container = document.getElementById('profile-info'); if (currentUser) { container.innerHTML = `<p><strong>Email:</strong> ${currentUser.email}</p><p>Welcome to your profile page. More features coming soon!</p>`; } };
+        const updateBadges = () => { const cartBadge = document.getElementById('cart-badge'); const wishlistBadge = document.getElementById('wishlist-badge'); const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0); if (cartCount > 0) { cartBadge.textContent = cartCount; cartBadge.classList.remove('hidden'); } else { cartBadge.classList.add('hidden'); } const wishlistCount = wishlist.length; if (wishlistCount > 0) { wishlistBadge.textContent = wishlistCount; wishlistBadge.classList.remove('hidden'); } else { wishlistBadge.classList.add('hidden'); } };
+        
+        // --- ALL OTHER JS FUNCTIONS (Auth, Sync, Data Handling, Event Listeners) are unchanged and included below ---
+        onAuthStateChanged(auth, user => { currentUser = user; updateUIForAuthState(); if (user) { syncLocalStorageToFirebase(); listenToUserData(); } else { loadDataFromLocalStorage(); updateBadges(); renderProducts(products); } });
+        const updateUIForAuthState = () => { const authRequiredLinks = document.querySelectorAll('.auth-required'); const guestOnlyLinks = document.querySelectorAll('.guest-only'); if (currentUser) { authRequiredLinks.forEach(el => el.classList.remove('hidden')); guestOnlyLinks.forEach(el => el.classList.add('hidden')); } else { authRequiredLinks.forEach(el => el.classList.add('hidden')); guestOnlyLinks.forEach(el => el.classList.remove('hidden')); } };
+        document.getElementById('login-form').addEventListener('submit', async e => { e.preventDefault(); const modalContent = authModal.querySelector('.modal-content'); try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); showToast('Logged in successfully!'); closeModal(authModal); } catch (error) { modalContent.classList.add('shake'); showToast('Wrong email or password.', 'error'); setTimeout(() => { modalContent.classList.remove('shake'); }, 500); } });
+        document.getElementById('register-form').addEventListener('submit', async e => { e.preventDefault(); try { await createUserWithEmailAndPassword(auth, document.getElementById('register-email').value, document.getElementById('register-password').value); closeModal(authModal); showToast('Registered successfully!'); } catch (error) { showToast(error.message, 'error'); } });
+        document.getElementById('logout-nav-link').addEventListener('click', async e => { e.preventDefault(); await signOut(auth); cart = []; wishlist = []; window.location.hash = '#home'; showToast('Logged out.'); });
+        const loadDataFromLocalStorage = () => { cart = JSON.parse(localStorage.getItem('cart')) || []; wishlist = JSON.parse(localStorage.getItem('wishlist')) || []; };
+        const saveDataToLocalStorage = () => { localStorage.setItem('cart', JSON.stringify(cart)); localStorage.setItem('wishlist', JSON.stringify(wishlist)); };
+        const syncLocalStorageToFirebase = async () => { const localCart = JSON.parse(localStorage.getItem('cart')) || []; const localWishlist = JSON.parse(localStorage.getItem('wishlist')) || []; if (localCart.length > 0 || localWishlist.length > 0) { const userRef = ref(db, `users/${currentUser.uid}`); const snapshot = await get(userRef); const remoteData = snapshot.val() || {}; const remoteCart = remoteData.cart ? Object.values(remoteData.cart) : []; const remoteWishlist = remoteData.wishlist ? Object.values(remoteData.wishlist) : []; const mergedCart = [...remoteCart]; localCart.forEach(localItem => { const existingItem = mergedCart.find(item => item.productId === localItem.productId); if (existingItem) { existingItem.quantity += localItem.quantity; } else { mergedCart.push(localItem); } }); await set(ref(db, `users/${currentUser.uid}/cart`), mergedCart); const mergedWishlist = [...remoteWishlist]; localWishlist.forEach(localItem => { if (!mergedWishlist.some(item => item.productId === localItem.productId)) { mergedWishlist.push(localItem); } }); await set(ref(db, `users/${currentUser.uid}/wishlist`), mergedWishlist); localStorage.removeItem('cart'); localStorage.removeItem('wishlist'); showToast('Your guest cart and wishlist have been merged.'); } };
+        const fetchProducts = () => { onValue(ref(db, 'products'), snapshot => { const data = snapshot.val(); products = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : []; handleRouteChange(); renderProducts(products); }); };
+        const listenToUserData = () => { if (!currentUser) return; onValue(ref(db, `users/${currentUser.uid}/cart`), snapshot => { cart = snapshot.val() || []; updateBadges(); if (window.location.hash === '#cart') renderCart(); }); onValue(ref(db, `users/${currentUser.uid}/wishlist`), snapshot => { wishlist = snapshot.val() || []; updateBadges(); if (window.location.hash === '#wishlist') renderWishlist(); }); };
+        const fetchOrders = () => { onValue(ref(db, `orders/${currentUser.uid}`), snapshot => { renderOrders(snapshot.val()); }); };
+        const addToCart = async (productId, quantity = 1) => { const product = products.find(p => p.id === productId); if (!product) return; if (currentUser) { const cartRef = ref(db, `users/${currentUser.uid}/cart`); const snapshot = await get(cartRef); const currentCart = snapshot.val() || []; const existingItemIndex = currentCart.findIndex(item => item.productId === productId); if (existingItemIndex > -1) { currentCart[existingItemIndex].quantity += quantity; } else { currentCart.push({ productId, quantity }); } await set(cartRef, currentCart); } else { const existingItem = cart.find(item => item.productId === productId); if (existingItem) { existingItem.quantity += quantity; } else { cart.push({ productId, quantity }); } saveDataToLocalStorage(); updateBadges(); } showToast(`${product.name} added to cart!`); };
+        const removeFromCart = async (productId) => { if (currentUser) { const cartRef = ref(db, `users/${currentUser.uid}/cart`); const snapshot = await get(cartRef); const newCart = (snapshot.val() || []).filter(item => item.productId !== productId); await set(cartRef, newCart); } else { cart = cart.filter(item => item.productId !== productId); saveDataToLocalStorage(); updateBadges(); renderCart(); } showToast(`Item removed from cart.`); };
+        const addToWishlist = async (productId) => { const product = products.find(p => p.id === productId); if (!product) return; if (currentUser) { const wishlistRef = ref(db, `users/${currentUser.uid}/wishlist`); const snapshot = await get(wishlistRef); const currentWishlist = snapshot.val() || []; if (!currentWishlist.some(item => item.productId === productId)) { currentWishlist.push({ productId }); await set(wishlistRef, currentWishlist); showToast(`${product.name} added to wishlist!`); } else { showToast(`${product.name} is already in your wishlist.`, 'error'); } } else { if (!wishlist.some(item => item.productId === productId)) { wishlist.push({ productId }); saveDataToLocalStorage(); updateBadges(); showToast(`${product.name} added to wishlist!`); } else { showToast(`${product.name} is already in your wishlist.`, 'error'); } } };
+        const removeFromWishlist = async (productId) => { if (currentUser) { const wishlistRef = ref(db, `users/${currentUser.uid}/wishlist`); const snapshot = await get(wishlistRef); const newWishlist = (snapshot.val() || []).filter(item => item.productId !== productId); await set(wishlistRef, newWishlist); } else { wishlist = wishlist.filter(item => item.productId !== productId); saveDataToLocalStorage(); updateBadges(); renderWishlist(); } showToast(`Item removed from wishlist.`); };
+        const placeOrder = async () => { if (!currentUser) { showToast('Please login to place an order.', 'error'); openModal(authModal); return; } if (cart.length === 0) { showToast('Your cart is empty.', 'error'); return; } const orderItems = cart.map(item => { const product = products.find(p => p.id === item.productId); return { productId: item.productId, name: product.name, price: product.price, quantity: item.quantity }; }); const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0); const newOrderRef = push(ref(db, `orders/${currentUser.uid}`)); const orderData = { id: newOrderRef.key, userId: currentUser.uid, userEmail: currentUser.email, items: orderItems, total: total, status: 'Pending', date: new Date().toISOString() }; try { await set(newOrderRef, orderData); await remove(ref(db, `users/${currentUser.uid}/cart`)); showToast('Order placed successfully!'); window.location.hash = '#orders'; } catch (error) { showToast('Failed to place order. ' + error.message, 'error'); } };
+        window.addEventListener('hashchange', handleRouteChange);
+        window.addEventListener('DOMContentLoaded', () => { fetchProducts(); handleRouteChange(); });
+        document.getElementById('login-nav-link').addEventListener('click', e => { e.preventDefault(); openModal(authModal); });
+        document.querySelector('#auth-modal .modal-close').addEventListener('click', () => closeModal(authModal));
+        productDetailModal.addEventListener('click', (e) => { if (e.target === productDetailModal) closeModal(productDetailModal); });
+        document.querySelector('#product-detail-modal .modal-close').addEventListener('click', () => closeModal(productDetailModal));
+        document.getElementById('show-register').addEventListener('click', e => { e.preventDefault(); document.getElementById('login-form-container').classList.remove('active'); document.getElementById('register-form-container').classList.add('active'); });
+        document.getElementById('show-login').addEventListener('click', e => { e.preventDefault(); document.getElementById('register-form-container').classList.remove('active'); document.getElementById('login-form-container').classList.add('active'); });
+        document.body.addEventListener('click', e => { if (e.target.matches('.add-to-cart-btn')) { addToCart(e.target.dataset.id); } if (e.target.matches('.add-to-wishlist-btn, .add-to-wishlist-btn *')) { const btn = e.target.closest('.add-to-wishlist-btn'); addToWishlist(btn.dataset.id); } if(e.target.matches('.remove-from-wishlist-btn')) { const productId = e.target.dataset.id; addToCart(productId); removeFromWishlist(productId); } if (e.target.matches('.remove-from-cart-btn')) { removeFromCart(e.target.dataset.id); } if (e.target.matches('.product-image')) { const card = e.target.closest('.product-card'); const productId = card.dataset.id; const product = products.find(p => p.id === productId); if(product) { document.getElementById('product-detail-image').src = product.imageUrl; document.getElementById('product-detail-name').textContent = product.name; document.getElementById('product-detail-price').textContent = `$${product.price.toFixed(2)}`; document.getElementById('product-detail-description').textContent = product.description; document.getElementById('product-detail-stock').textContent = product.stock; document.getElementById('detail-add-to-cart-btn').dataset.id = product.id; document.getElementById('detail-add-to-wishlist-btn').dataset.id = product.id; openModal(productDetailModal); } } });
+        document.getElementById('detail-add-to-cart-btn').addEventListener('click', e => { addToCart(e.target.dataset.id); closeModal(productDetailModal); });
+        document.getElementById('detail-add-to-wishlist-btn').addEventListener('click', e => { addToWishlist(e.target.dataset.id); closeModal(productDetailModal); });
+        document.getElementById('checkout-btn').addEventListener('click', placeOrder);
+        const applyFiltersAndSort = () => { let filteredProducts = [...products]; const searchTerm = document.getElementById('search-bar').value.toLowerCase(); const sortValue = document.getElementById('sort-dropdown').value; if (searchTerm) { filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm)); } switch(sortValue) { case 'price-asc': filteredProducts.sort((a,b) => a.price - b.price); break; case 'price-desc': filteredProducts.sort((a,b) => b.price - a.price); break; case 'name-asc': filteredProducts.sort((a,b) => a.name.localeCompare(b.name)); break; case 'name-desc': filteredProducts.sort((a,b) => b.name.localeCompare(a.name)); break; } renderProducts(filteredProducts); };
+        document.getElementById('search-bar').addEventListener('input', applyFiltersAndSort);
+        document.getElementById('sort-dropdown').addEventListener('change', applyFiltersAndSort);
+        document.getElementById('contact-form').addEventListener('submit', async e => { e.preventDefault(); const name = document.getElementById('contact-name').value; const email = document.getElementById('contact-email').value; const message = document.getElementById('contact-message').value; try { await push(ref(db, 'messages'), { name, email, message, date: new Date().toISOString() }); showToast('Message sent successfully!'); e.target.reset(); } catch (error) { showToast('Failed to send message: ' + error.message, 'error'); } });
+    </script>
+</body>
+</html>

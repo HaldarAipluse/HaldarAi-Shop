@@ -107,7 +107,21 @@
         #slide-menu a { padding: 15px 25px; color: var(--text-color); text-decoration: none; font-size: 1.2rem; display: block; transition: all 0.3s ease; }
         #slide-menu a:hover { background: var(--glass-bg); color: var(--primary-glow); padding-left: 30px; }
         
-        #menu-user-info.menu-user-profile { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 15px; border-bottom: 1px solid var(--glass-border); }
+        /* NEW Close Menu Button Style */
+        #close-menu-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 2.5rem;
+            font-weight: 300;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        #menu-user-info.menu-user-profile { margin-top: 40px; /* Space for close button */ display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 15px; border-bottom: 1px solid var(--glass-border); }
         .menu-user-profile-img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; object-fit: cover; background-color: var(--glass-bg); border: 2px solid var(--glass-border); }
         .menu-user-profile-name { font-weight: bold; font-size: 1.1rem; }
         #menu-user-info:not(.menu-user-profile) { padding: 15px 25px; border-bottom: 1px solid var(--glass-border); }
@@ -180,6 +194,7 @@
     </header>
 
     <nav id="slide-menu">
+        <button id="close-menu-btn">&times;</button>
         <div id="menu-user-info"></div>
         <div id="menu-links"></div>
     </nav>
@@ -294,13 +309,11 @@
         const hamburgerBtn = document.getElementById('hamburger-btn'), slideMenu = document.getElementById('slide-menu');
         const productGrid = document.getElementById('product-grid'), views = document.querySelectorAll('.content-view');
         const themeToggleBtn = document.getElementById('theme-toggle-btn'), sunIcon = document.getElementById('sun-icon'), moonIcon = document.getElementById('moon-icon');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
 
         function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark-mode'); moonIcon.classList.add('hidden'); sunIcon.classList.remove('hidden');
-            } else {
-                document.body.classList.remove('dark-mode'); moonIcon.classList.remove('hidden'); sunIcon.classList.add('hidden');
-            }
+            if (theme === 'dark') { document.body.classList.add('dark-mode'); moonIcon.classList.add('hidden'); sunIcon.classList.remove('hidden'); } 
+            else { document.body.classList.remove('dark-mode'); moonIcon.classList.remove('hidden'); sunIcon.classList.add('hidden'); }
         }
         themeToggleBtn.addEventListener('click', () => {
             const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
@@ -357,7 +370,8 @@
         }
         
         function setupEventListeners() {
-            hamburgerBtn.addEventListener('click', () => slideMenu.classList.toggle('active'));
+            hamburgerBtn.addEventListener('click', () => slideMenu.classList.add('active'));
+            closeMenuBtn.addEventListener('click', closeMenu); // Added listener for close button
             document.getElementById('search-bar').addEventListener('input', filterProducts);
             document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', closeModal));
             document.querySelectorAll('.modal-overlay').forEach(overlay => overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); }));

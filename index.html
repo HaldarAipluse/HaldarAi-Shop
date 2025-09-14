@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>HaldarAi Shop • Online Shop</title>
     <style>
         /* Light Theme (Default) */
@@ -54,7 +54,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -107,24 +107,27 @@
         #slide-menu a { padding: 15px 25px; color: var(--text-color); text-decoration: none; font-size: 1.2rem; display: block; transition: all 0.3s ease; }
         #slide-menu a:hover { background: var(--glass-bg); color: var(--primary-glow); padding-left: 30px; }
         
-        /* NEW Close Menu Button Style */
         #close-menu-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 2.5rem;
-            font-weight: 300;
-            cursor: pointer;
-            line-height: 1;
+            position: absolute; top: 10px; right: 15px; background: none;
+            border: none; color: var(--text-color); font-size: 2.5rem;
+            font-weight: 300; cursor: pointer; line-height: 1;
         }
 
-        #menu-user-info.menu-user-profile { margin-top: 40px; /* Space for close button */ display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 15px; border-bottom: 1px solid var(--glass-border); }
+        #menu-user-info.menu-user-profile { margin-top: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 15px; border-bottom: 1px solid var(--glass-border); }
         .menu-user-profile-img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; object-fit: cover; background-color: var(--glass-bg); border: 2px solid var(--glass-border); }
         .menu-user-profile-name { font-weight: bold; font-size: 1.1rem; }
         #menu-user-info:not(.menu-user-profile) { padding: 15px 25px; border-bottom: 1px solid var(--glass-border); }
+        
+        #banner-carousel-container {
+            width: 100%; margin-bottom: 2rem; border-radius: 20px;
+            overflow: hidden; position: relative; box-shadow: 0 8px 32px 0 var(--shadow-color-light);
+        }
+        #banner-carousel { display: flex; transition: transform 0.5s ease-in-out; }
+        .banner-slide { min-width: 100%; position: relative; }
+        .banner-slide img { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+        #banner-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+        .banner-dot { width: 8px; height: 8px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.5); cursor: pointer; transition: background-color 0.3s ease; }
+        .banner-dot.active { background-color: var(--primary-glow); }
 
         #search-container { margin-bottom: 2rem; }
         #search-bar { width: 100%; padding: 15px 20px; font-size: 1.1rem; background: var(--card-bg-1); border: 1px solid var(--glass-border); border-radius: 50px; color: var(--text-color); transition: all 0.4s ease; }
@@ -170,6 +173,11 @@
         #auth-message { color: var(--accent-glow); margin-bottom: 1rem; font-weight: bold; }
         .modal-close-btn.cancel-btn { background: var(--btn-secondary-bg) !important; color: var(--btn-secondary-text) !important; box-shadow: none !important;}
         .modal-close-btn.cancel-btn:hover { background: var(--btn-secondary-hover-bg) !important; }
+
+        .social-links { display: flex; gap: 1.5rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap; }
+        .social-link { display: flex; align-items: center; gap: 8px; color: var(--text-color); text-decoration: none; transition: color 0.3s ease; opacity: 0.8; }
+        .social-link:hover { color: var(--primary-glow); opacity: 1; }
+        .social-link svg { width: 28px; height: 28px; }
         
         #bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--header-bg); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 0.5rem 0; z-index: 999; }
         .bottom-btn { background: none; border: none; color: var(--text-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; opacity: 0.8; transition: all 0.3s ease; }
@@ -180,13 +188,8 @@
 <body>
 
     <header id="main-header">
-        <button id="hamburger-btn">
-            <div class="line"></div><div class="line"></div><div class="line"></div>
-        </button>
-        <div id="header-brand">
-            <img id="brand-logo" src="https://i.ibb.co/BKvqBt5N/O.png" alt="Logo">
-            <span id="brand-name">HaldarAi Shop</span>
-        </div>
+        <button id="hamburger-btn"><div class="line"></div><div class="line"></div><div class="line"></div></button>
+        <div id="header-brand"><img id="brand-logo" src="https://i.ibb.co/BKvqBt5N/O.png" alt="Logo"><span id="brand-name">HaldarAi Shop</span></div>
         <button id="theme-toggle-btn" title="Toggle theme">
             <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 008.252-4.498z" /></svg>
             <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
@@ -202,6 +205,10 @@
     <main class="container">
         <!-- Views -->
         <div id="products-view" class="content-view">
+            <div id="banner-carousel-container" class="hidden">
+                <div id="banner-carousel"></div>
+                <div id="banner-dots"></div>
+            </div>
             <div id="search-container"><input type="text" id="search-bar" class="glow-input" placeholder="Search products..."></div>
             <div id="product-grid"></div>
         </div>
@@ -210,11 +217,19 @@
         <div id="contact-us-view" class="content-view hidden glass-card">
             <h2>Contact Us</h2>
             <div id="contact-info">
-                <p><strong>Brand:</strong> HaldarAi Shop</p><p><strong>Operator:</strong> E-commerce</p><p><strong>Address:</strong> N/A</p>
+                <p><strong>Brand:</strong>HaldarAi Shop</p><p><strong>Operator:</strong> E-commerce</p><p><strong>Address:</strong> N/A</p>
                 <p><strong>Location:</strong> Kolkata / West Bengal / 712303</p><p><strong>Email:</strong> officialhaldarai@gmail.com</p>
-                <p><strong>Phone:</strong> 8637856826</p><br>
-                <a href="https://x.com/haldariq" target="_blank" style="color: var(--primary-glow); margin-right: 1rem; text-decoration: none;">X (Twitter)</a>
-                <a href="https://youtube.com/@haldariq" target="_blank" style="color: var(--primary-glow); text-decoration: none;">YouTube</a>
+                <p><strong>Phone:</strong> 8637856826</p>
+            </div>
+            <div class="social-links">
+                <a href="https://x.com/haldariq" target="_blank" class="social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                    <span>X (Twitter)</span>
+                </a>
+                <a href="https://youtube.com/@haldariq" target="_blank" class="social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10,15L15.19,12L10,9V15M21.56,7.17C21.69,7.64 21.78,8.27 21.84,9.07C21.91,9.87 21.94,10.56 21.94,11.16L22,12C22,12.89 21.94,13.78 21.84,14.67C21.78,15.56 21.69,16.25 21.56,16.72C21.31,17.7 20.73,18.44 19.96,18.9C19.37,19.24 18.59,19.42 17.5,19.5C15.55,19.58 13.53,19.64 12,19.64C10.47,19.64 8.45,19.58 6.5,19.5C5.41,19.42 4.63,19.24 4.04,18.9C3.27,18.44 2.69,17.7 2.44,16.72C2.31,16.25 2.22,15.56 2.16,14.67C2.09,13.78 2.06,12.89 2.06,12L2,11.16C2,10.56 2.03,9.87 2.09,9.07C2.16,8.27 2.25,7.64 2.38,7.17C2.63,6.2 3.21,5.46 3.98,5C4.57,4.66 5.35,4.48 6.44,4.4C8.39,4.32 10.41,4.26 12,4.26C13.53,4.26 15.55,4.32 17.5,4.4C18.59,4.48 19.37,4.66 19.96,5C20.73,5.46 21.31,6.2 21.56,7.17Z"></path></svg>
+                    <span>YouTube</span>
+                </a>
             </div>
         </div>
         <div id="profile-view" class="content-view hidden glass-card">
@@ -238,56 +253,46 @@
     </footer>
 
     <!-- MODALS -->
-    <div id="product-detail-modal" class="modal-overlay">
-        <div class="modal-content glass-card">
-            <div class="modal-header"><h2 id="product-detail-title"></h2><button class="modal-close-btn" style="background:none; border:none; color:var(--text-color); font-size:2rem; cursor:pointer;">&times;</button></div>
-            <div id="product-detail-img-container"><img id="product-detail-img" src="" alt="Product Image"></div>
-            <p id="product-detail-desc"></p>
-            <div id="product-detail-footer">
-                <div id="product-detail-prices"><span class="original" id="product-detail-original-price"></span><span class="discount" id="product-detail-discount-price"></span></div>
-                <button id="buy-now-btn" class="glow-btn">Buy Now</button>
-            </div>
+    <div id="product-detail-modal" class="modal-overlay"><div class="modal-content glass-card">
+        <div class="modal-header"><h2 id="product-detail-title"></h2><button class="modal-close-btn" style="background:none; border:none; color:var(--text-color); font-size:2rem; cursor:pointer;">&times;</button></div>
+        <div id="product-detail-img-container"><img id="product-detail-img" src="" alt="Product Image"></div>
+        <p id="product-detail-desc"></p>
+        <div id="product-detail-footer">
+            <div id="product-detail-prices"><span class="original" id="product-detail-original-price"></span><span class="discount" id="product-detail-discount-price"></span></div>
+            <button id="buy-now-btn" class="glow-btn">Buy Now</button>
         </div>
-    </div>
-    <div id="buy-now-modal" class="modal-overlay">
-         <div class="modal-content glass-card">
-            <h2>Your Details</h2>
-            <form id="user-info-form">
-                <input type="text" id="user-name" class="glow-input" placeholder="Full Name" required><input type="email" id="user-email" class="glow-input" placeholder="Email Address" required>
-                <input type="tel" id="user-phone" class="glow-input" placeholder="Phone Number" required>
-                <div style="display:flex; gap: 1rem; margin-top: 1rem;"><button type="submit" class="glow-btn">Proceed to Pay</button><button type="button" class="modal-close-btn glow-btn cancel-btn">Cancel</button></div>
-            </form>
-        </div>
-    </div>
-    <div id="auth-modal" class="modal-overlay">
-        <div class="modal-content glass-card">
-            <h2 id="auth-title">Login</h2>
-            <form id="auth-form">
-                <div id="auth-message" class="hidden"></div>
-                <p id="auth-error" style="color:var(--error-color); margin-bottom:1rem;"></p>
-                <div id="auth-email-group"><input type="email" id="auth-email" class="glow-input" placeholder="Email" required></div>
-                <div id="auth-password-group"><input type="password" id="auth-password" class="glow-input" placeholder="Password"></div>
-                <div id="auth-confirm-password-group" class="hidden"><input type="password" id="auth-confirm-password" class="glow-input" placeholder="Confirm Password"></div>
-                <button type="submit" id="auth-action-btn" class="glow-btn" style="width: 100%;">Login</button>
-            </form>
-            <div id="auth-links" style="text-align: center;"></div>
-            <button type="button" class="modal-close-btn glow-btn cancel-btn" style="margin-top: 1rem; width: 100%;">Cancel</button>
-        </div>
-    </div>
-    <div id="policy-modal" class="modal-overlay">
-        <div class="modal-content glass-card">
-             <div class="modal-header"><h2 id="policy-title"></h2><button class="modal-close-btn" style="background: none; border: none; font-size: 2rem; color: var(--text-color);">&times;</button></div>
-            <div id="policy-content" style="white-space: pre-wrap; opacity: 0.9;"></div>
-        </div>
-    </div>
+    </div></div>
+    <div id="buy-now-modal" class="modal-overlay"><div class="modal-content glass-card">
+        <h2>Your Details</h2>
+        <form id="user-info-form">
+            <input type="text" id="user-name" class="glow-input" placeholder="Full Name" required><input type="email" id="user-email" class="glow-input" placeholder="Email Address" required>
+            <input type="tel" id="user-phone" class="glow-input" placeholder="Phone Number" required>
+            <div style="display:flex; gap: 1rem; margin-top: 1rem;"><button type="submit" class="glow-btn">Proceed to Pay</button><button type="button" class="modal-close-btn glow-btn cancel-btn">Cancel</button></div>
+        </form>
+    </div></div>
+    <div id="auth-modal" class="modal-overlay"><div class="modal-content glass-card">
+        <h2 id="auth-title">Login</h2>
+        <form id="auth-form">
+            <div id="auth-message" class="hidden"></div>
+            <p id="auth-error" style="color:var(--error-color); margin-bottom:1rem;"></p>
+            <div id="auth-email-group"><input type="email" id="auth-email" class="glow-input" placeholder="Email" required></div>
+            <div id="auth-password-group"><input type="password" id="auth-password" class="glow-input" placeholder="Password"></div>
+            <div id="auth-confirm-password-group" class="hidden"><input type="password" id="auth-confirm-password" class="glow-input" placeholder="Confirm Password"></div>
+            <button type="submit" id="auth-action-btn" class="glow-btn" style="width: 100%;">Login</button>
+        </form>
+        <div id="auth-links" style="text-align: center;"></div>
+        <button type="button" class="modal-close-btn glow-btn cancel-btn" style="margin-top: 1rem; width: 100%;">Cancel</button>
+    </div></div>
+    <div id="policy-modal" class="modal-overlay"><div class="modal-content glass-card">
+        <div class="modal-header"><h2 id="policy-title"></h2><button class="modal-close-btn" style="background: none; border: none; font-size: 2rem; color: var(--text-color);">&times;</button></div>
+        <div id="policy-content" style="white-space: pre-wrap; opacity: 0.9;"></div>
+    </div></div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { getDatabase, ref, onValue, set, get, push } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
-        // ========== PASTE YOUR FIREBASE CONFIG HERE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyBF8WGFStX62SCFqhMzqcvIFI0LZTJfd30",
             authDomain: "social-media-420.firebaseapp.com",
@@ -298,18 +303,15 @@
             appId: "1:137093270524:web:2847379ede160b6c73c079",
             measurementId: "G-G842MWTJKD"
         };
-        // ========== END FIREBASE CONFIG SECTION ==========
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getDatabase(app);
         
-        let allProducts = {}, currentUser = null, currentProduct = null, authMode = 'login'; 
-
+        let allProducts = {}, currentUser = null, currentProduct = null, authMode = 'login', currentSlide = 0, slideInterval;
+        
         const hamburgerBtn = document.getElementById('hamburger-btn'), slideMenu = document.getElementById('slide-menu');
         const productGrid = document.getElementById('product-grid'), views = document.querySelectorAll('.content-view');
         const themeToggleBtn = document.getElementById('theme-toggle-btn'), sunIcon = document.getElementById('sun-icon'), moonIcon = document.getElementById('moon-icon');
         const closeMenuBtn = document.getElementById('close-menu-btn');
+        const bannerContainer = document.getElementById('banner-carousel-container'), bannerCarousel = document.getElementById('banner-carousel'), bannerDots = document.getElementById('banner-dots');
 
         function applyTheme(theme) {
             if (theme === 'dark') { document.body.classList.add('dark-mode'); moonIcon.classList.add('hidden'); sunIcon.classList.remove('hidden'); } 
@@ -322,7 +324,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme(localStorage.getItem('theme') || 'light');
-            fetchProducts(); setupEventListeners();
+            fetchBanners(); fetchProducts(); setupEventListeners();
         });
 
         onAuthStateChanged(auth, user => { currentUser = user; updateMenu(); if(Object.keys(allProducts).length > 0) renderProducts(allProducts); });
@@ -353,6 +355,45 @@
             });
         }
         
+        function fetchBanners() { onValue(ref(db, 'banners'), snap => { renderBanners(snap.val()); }); }
+        
+        function renderBanners(banners) {
+            if (!banners || Object.keys(banners).length === 0) { bannerContainer.classList.add('hidden'); return; }
+            bannerContainer.classList.remove('hidden');
+            bannerCarousel.innerHTML = ''; bannerDots.innerHTML = ''; clearInterval(slideInterval);
+            
+            const bannerEntries = Object.values(banners);
+            bannerEntries.forEach((banner, index) => {
+                const slide = document.createElement('div'); slide.className = 'banner-slide';
+                const content = `<img src="${banner.imageUrl}" alt="Banner ${index + 1}">`;
+                slide.innerHTML = banner.linkUrl ? `<a href="${banner.linkUrl}" target="_blank">${content}</a>` : content;
+                bannerCarousel.appendChild(slide);
+
+                const dot = document.createElement('span'); dot.className = 'banner-dot';
+                dot.addEventListener('click', () => showSlide(index));
+                bannerDots.appendChild(dot);
+            });
+            
+            currentSlide = 0;
+            showSlide(currentSlide);
+            slideInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % bannerEntries.length;
+                showSlide(currentSlide);
+            }, 4000);
+        }
+
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('.banner-dot');
+            if(index >= slides.length) index = 0;
+            if(index < 0) index = slides.length - 1;
+            
+            bannerCarousel.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach(dot => dot.classList.remove('active'));
+            if(dots[index]) dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
         function fetchProducts() { onValue(ref(db, 'products'), snap => { allProducts = snap.val() || {}; renderProducts(allProducts); }); }
         
         async function renderProducts(products) {
@@ -371,7 +412,7 @@
         
         function setupEventListeners() {
             hamburgerBtn.addEventListener('click', () => slideMenu.classList.add('active'));
-            closeMenuBtn.addEventListener('click', closeMenu); // Added listener for close button
+            closeMenuBtn.addEventListener('click', closeMenu);
             document.getElementById('search-bar').addEventListener('input', filterProducts);
             document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', closeModal));
             document.querySelectorAll('.modal-overlay').forEach(overlay => overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); }));

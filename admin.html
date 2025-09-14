@@ -1,1 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Admin Panel</title>
+    <style>
+        :root {
+            --bg-color: #0a0a1a;
+            --primary-glow: #00ffff; --secondary-glow: #9400d3;
+            --accent-glow: #39ff14; --error-glow: #ff3b30;
+            --text-color: #f0f0f0; --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --header-bg: rgba(10, 10, 30, 0.7);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text-color);
+            line-height: 1.6; overflow-x: hidden;
+        }
+        .container { padding: 70px 1rem 80px 1rem; }
+        .hidden { display: none !important; }
 
+        /* --- Main App Layout --- */
+        #admin-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.8rem 1rem; background: var(--header-bg); border-bottom: 1px solid var(--glass-border);
+            position: fixed; top: 0; width:100%; z-index: 100; backdrop-filter: blur(10px);
+        }
+        #brand-info { display: flex; align-items: center; gap: 15px; }
+        #brand-logo { max-height: 40px; border-radius: 50%; }
+        #brand-name-header { font-size: 1.2rem; font-weight: 600; }
+
+        .view { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .view-title { font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--primary-glow); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        
+        .glow-input {
+            width: 100%; padding: 12px 15px; margin-bottom: 1rem;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+            border-radius: 10px; color: var(--text-color); font-size: 1rem;
+        }
+        .glow-input:focus { outline: none; border-color: var(--primary-glow); box-shadow: 0 0 15px var(--primary-glow); }
+        
+        .glow-btn {
+            display: inline-block; padding: 12px 25px; border: none; border-radius: 10px;
+            color: #fff; font-weight: bold; font-size: 1rem; cursor: pointer; text-align: center;
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); transition: all 0.3s ease;
+        }
+        .glow-btn:hover { transform: scale(1.05); }
+        .glow-btn.secondary { background: #555; box-shadow: none; }
+        .glow-btn.danger { background: linear-gradient(45deg, var(--error-glow), #ff9500); }
+        .full-width { width: 100%; }
+
+        /* --- Item Cards (Products, Banners) --- */
+        .item-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .item-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 1rem; display: flex; flex-direction: column;
+        }
+        .item-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 1rem; }
+        .item-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; word-break: break-word; }
+        .item-card p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem; flex-grow: 1; }
+        .item-card .price { font-weight: bold; color: var(--accent-glow); }
+        .item-card-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-color); padding: 5px; }
+        .icon-btn svg { width: 22px; height: 22px; }
+        .edit-btn:hover { color: var(--primary-glow); }
+        .delete-btn:hover { color: var(--error-glow); }
+
+        /* --- List View (Users, Orders) --- */
+        .list-view { display: flex; flex-direction: column; gap: 1rem; }
+        .list-item-card { background: rgba(0, 255, 255, 0.05); border: 1px solid var(--primary-glow); padding: 1rem; border-radius: 16px; }
+        .list-item-card p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+        .list-item-card strong { color: var(--primary-glow); }
+        .list-item-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .list-item-header { display: flex; justify-content: space-between; align-items: flex-start; }
+
+        /* --- Floating Action Button (FAB) --- */
+        #fab-add-btn {
+            position: fixed; bottom: 80px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--accent-glow); box-shadow: 0 4px 20px var(--accent-glow)88;
+            border: none; color: white; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 500; transition: transform 0.3s ease;
+        }
+        #fab-add-btn:hover { transform: scale(1.1); }
+        #fab-add-btn svg { width: 28px; height: 28px; }
+
+        /* --- Bottom Navigation --- */
+        #bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--header-bg); border-top: 1px solid var(--glass-border);
+            display: flex; justify-content: space-around; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .nav-btn {
+            background: none; border: none; color: var(--text-color);
+            cursor: pointer; padding: 10px 12px; flex-grow: 1;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 4px; font-size: 0.7rem; opacity: 0.7; transition: all 0.3s ease;
+        }
+        .nav-btn svg { width: 24px; height: 24px; }
+        .nav-btn.active { opacity: 1; color: var(--primary-glow); transform: translateY(-3px); }
+
+        /* --- Modals & Login --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { width: 90%; max-width: 500px; }
+        #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #login-card { width: 90%; max-width: 400px; text-align: center; }
+        #login-card h1 { margin-bottom: 1.5rem; color: var(--primary-glow); text-shadow: 0 0 10px var(--primary-glow); }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div id="login-card" class="glass-card">
+            <h1>Admin Login</h1>
+            <form id="login-form"><input type="email" id="email" class="glow-input" placeholder="Email" required><input type="password" id="password" class="glow-input" placeholder="Password" required><button type="submit" class="glow-btn full-width">Login</button></form>
+            <p id="login-error" style="color: var(--error-glow); margin-top: 1rem;"></p>
+        </div>
+    </div>
+
+    <div id="admin-dashboard" class="hidden">
+        <header id="admin-header">
+            <div id="brand-info"><img id="brand-logo" src="https://i.ibb.co/BKvqBt5N/O.png" alt="Logo"><span id="brand-name-header">Admin</span></div>
+            <button id="logout-btn" class="glow-btn danger" style="padding: 8px 15px; font-size: 0.9rem;">Logout</button>
+        </header>
+        
+        <main class="container">
+            <div id="products-view" class="view"><h2 class="view-title">Products</h2><div id="product-grid" class="item-grid"></div></div>
+            <div id="banners-view" class="view hidden"><h2 class="view-title">Banners</h2><div id="banner-grid" class="item-grid"></div></div>
+            <div id="users-view" class="view hidden"><h2 class="view-title">Users</h2><div id="user-list" class="list-view"></div></div>
+            <div id="orders-view" class="view hidden"><h2 class="view-title">Recent Orders</h2><div id="orders-list" class="list-view"></div></div>
+        </main>
+
+        <button id="fab-add-btn" class="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        </button>
+
+        <nav id="bottom-nav">
+            <button class="nav-btn active" data-view="products-view">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" /></svg>
+                <span>Products</span>
+            </button>
+            <button class="nav-btn" data-view="banners-view">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm16.5-1.5H3.75" /></svg>
+                <span>Banners</span>
+            </button>
+             <button class="nav-btn" data-view="users-view">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962c.51.056 1.02.083 1.53.083 2.12 0 4.12-.662 5.68-1.79m-1.03-3.033A6.706 6.706 0 0112 11a6.706 6.706 0 01-3.157-1.033m5.143-2.962a4.5 4.5 0 11-9.286 0M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <span>Users</span>
+            </button>
+            <button class="nav-btn" data-view="orders-view">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <span>Orders</span>
+            </button>
+        </nav>
+    </div>
+    
+    <div id="product-modal" class="modal"><div class="modal-content glass-card">
+        <h2 id="modal-title">Add Product</h2>
+        <form id="product-form">
+            <input type="hidden" id="productId"><input type="text" id="productTitle" class="glow-input" placeholder="Product Title" required>
+            <input type="url" id="productImageUrl" class="glow-input" placeholder="Image URL" required><textarea id="productDescription" class="glow-input" placeholder="Description" rows="3" required></textarea>
+            <div class="form-grid"><input type="number" id="originalPrice" class="glow-input" placeholder="Original Price" required><input type="number" id="discountPrice" class="glow-input" placeholder="Discount Price" required></div>
+            <input type="url" id="paymentLink" class="glow-input" placeholder="Payment Link" required>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;"><button type="submit" class="glow-btn">Save</button><button type="button" class="glow-btn secondary modal-cancel-btn">Cancel</button></div>
+        </form>
+    </div></div>
+    <div id="banner-modal" class="modal"><div class="modal-content glass-card">
+        <h2>Add Banner</h2>
+        <form id="banner-form">
+            <input type="url" id="bannerImageUrl" class="glow-input" placeholder="Banner Image URL" required><input type="url" id="bannerLinkUrl" class="glow-input" placeholder="Link URL (Optional)">
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;"><button type="submit" class="glow-btn">Save</button><button type="button" class="glow-btn secondary modal-cancel-btn">Cancel</button></div>
+        </form>
+    </div></div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBF8WGFStX62SCFqhMzqcvIFI0LZTJfd30",
+            authDomain: "social-media-420.firebaseapp.com",
+            databaseURL: "https://social-media-420-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "social-media-420",
+            storageBucket: "social-media-420.firebasestorage.app",
+            messagingSenderId: "137093270524",
+            appId: "1:137093270524:web:2847379ede160b6c73c079"
+        };
+        const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getDatabase(app);
+        
+        const DOM = {
+            loginScreen: document.getElementById('login-screen'), adminDashboard: document.getElementById('admin-dashboard'),
+            loginForm: document.getElementById('login-form'), loginError: document.getElementById('login-error'),
+            logoutBtn: document.getElementById('logout-btn'), 
+            views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
+            productGrid: document.getElementById('product-grid'), ordersList: document.getElementById('orders-list'),
+            bannerGrid: document.getElementById('banner-grid'), userList: document.getElementById('user-list'),
+            productModal: document.getElementById('product-modal'), productForm: document.getElementById('product-form'),
+            bannerModal: document.getElementById('banner-modal'), bannerForm: document.getElementById('banner-form'),
+            modalTitle: document.getElementById('modal-title'), fab: document.getElementById('fab-add-btn')
+        };
+        
+        let currentView = 'products-view';
+
+        const switchView = (viewId) => {
+            currentView = viewId;
+            DOM.views.forEach(v => v.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            DOM.navBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector(`.nav-btn[data-view="${viewId}"]`).classList.add('active');
+            
+            if (viewId === 'products-view' || viewId === 'banners-view') DOM.fab.classList.remove('hidden');
+            else DOM.fab.classList.add('hidden');
+        };
+
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                DOM.loginScreen.classList.add('hidden'); DOM.adminDashboard.classList.remove('hidden');
+                loadDashboardData(); switchView('products-view');
+            } else {
+                DOM.loginScreen.classList.remove('hidden'); DOM.adminDashboard.classList.add('hidden');
+            }
+        });
+
+        DOM.loginForm.addEventListener('submit', e => {
+            e.preventDefault();
+            signInWithEmailAndPassword(auth, email.value, password.value).catch(err => DOM.loginError.textContent = err.message);
+        });
+        DOM.logoutBtn.addEventListener('click', () => signOut(auth));
+        DOM.navBtns.forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
+
+        function loadDashboardData() {
+            onValue(ref(db, 'products'), s => { renderGrid(DOM.productGrid, s.val(), createProductCard, 'No products.'); });
+            onValue(ref(db, 'banners'), s => { renderGrid(DOM.bannerGrid, s.val(), createBannerCard, 'No banners.'); });
+            onValue(ref(db, 'users'), s => { renderList(DOM.userList, s.val(), createUserCard, 'No users.'); });
+            onValue(ref(db, 'orders'), s => { renderList(DOM.ordersList, s.val(), createOrderCard, 'No orders.'); });
+        }
+
+        const renderGrid = (el, data, cardFn, msg) => { el.innerHTML = data ? '' : `<p>${msg}</p>`; if (data) Object.entries(data).forEach(([k, i]) => el.appendChild(cardFn(k, i))); };
+        const renderList = (el, data, cardFn, msg) => { el.innerHTML = data ? '' : `<p>${msg}</p>`; if (data) Object.entries(data).reverse().forEach(([k, i]) => el.appendChild(cardFn(k, i))); };
+        
+        const createProductCard = (id, p) => {
+            const card = document.createElement('div'); card.className = 'item-card';
+            card.innerHTML = `<img src="${p.imageUrl}" alt="${p.title}"><h3>${p.title}</h3><p>${(p.description || "").substring(0, 80)}...</p><div class="price">₹${p.discountPrice}</div><div class="item-card-actions"><button class="icon-btn edit-btn" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></button><button class="icon-btn delete-btn" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.033c-1.12 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button></div>`;
+            card.querySelector('.edit-btn').addEventListener('click', () => openProductModal(id, p));
+            card.querySelector('.delete-btn').addEventListener('click', () => deleteItem('products', id, 'product'));
+            return card;
+        };
+        const openProductModal = (id = null, data = {}) => {
+            DOM.productForm.reset(); DOM.productModal.classList.add('active');
+            DOM.modalTitle.textContent = id ? 'Edit Product' : 'Add Product';
+            if (id) {
+                Object.keys(data).forEach(key => { const el = document.getElementById(`product${key.charAt(0).toUpperCase() + key.slice(1)}`); if(el) el.value = data[key]; });
+                document.getElementById('productId').value = id;
+            }
+        };
+        DOM.productForm.addEventListener('submit', e => {
+            e.preventDefault(); const id = productId.value;
+            const data = { title: productTitle.value, imageUrl: productImageUrl.value, description: productDescription.value, originalPrice: originalPrice.value, discountPrice: discountPrice.value, paymentLink: paymentLink.value, createdAt: new Date().toISOString() };
+            const dbRef = id ? ref(db, `products/${id}`) : push(ref(db, 'products'));
+            set(dbRef, data).then(() => { alert('Product saved!'); DOM.productModal.classList.remove('active'); }).catch(err => alert(`Error: ${err.message}`));
+        });
+
+        const createBannerCard = (id, banner) => {
+            const card = document.createElement('div'); card.className = 'item-card';
+            card.innerHTML = `<img src="${banner.imageUrl}" alt="Banner"><p>Links to: ${banner.linkUrl || 'N/A'}</p><div class="item-card-actions"><button class="icon-btn delete-btn" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.033c-1.12 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button></div>`;
+            card.querySelector('.delete-btn').addEventListener('click', () => deleteItem('banners', id, 'banner'));
+            return card;
+        };
+        DOM.bannerForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const data = { imageUrl: bannerImageUrl.value, linkUrl: bannerLinkUrl.value };
+            push(ref(db, 'banners'), data).then(() => { alert('Banner saved!'); DOM.bannerModal.classList.remove('active'); DOM.bannerForm.reset(); }).catch(err => alert(`Error: ${err.message}`));
+        });
+
+        const createUserCard = (uid, user) => {
+            const p = user.profile || {}; const card = document.createElement('div'); card.className = 'list-item-card';
+            card.innerHTML = `<div class="list-item-header"><h3>${p.name || 'Unnamed User'}</h3><button class="icon-btn delete-btn" title="Delete User Data"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.033c-1.12 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button></div><p><strong>UID:</strong> ${uid}</p><p><strong>Phone:</strong> ${p.phone || 'N/A'}</p>`;
+            card.querySelector('.delete-btn').addEventListener('click', () => deleteItem('users', uid, 'user data'));
+            return card;
+        };
+        const createOrderCard = (id, order) => {
+            const card = document.createElement('div'); card.className = 'list-item-card';
+            card.innerHTML = `<div class="list-item-header"><h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Order #${id.substring(id.length - 6).toUpperCase()}</h3><button class="icon-btn delete-btn" title="Delete Order"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.033c-1.12 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button></div><p><strong>Product:</strong> ${order.productSnapshot.title}</p><p><strong>Customer:</strong> ${order.userInput.name} (${order.userInput.email})</p><p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>`;
+            card.querySelector('.delete-btn').addEventListener('click', () => deleteItem('orders', id, 'order'));
+            return card;
+        };
+
+        DOM.fab.addEventListener('click', () => {
+            if (currentView === 'products-view') openProductModal();
+            else if (currentView === 'banners-view') DOM.bannerModal.classList.add('active');
+        });
+        document.querySelectorAll('.modal-cancel-btn').forEach(btn => btn.addEventListener('click', () => {
+            DOM.productModal.classList.remove('active'); DOM.bannerModal.classList.remove('active');
+        }));
+        function deleteItem(path, id, name) {
+            if (confirm(`Delete this ${name}? This cannot be undone.`)) {
+                remove(ref(db, `${path}/${id}`)).then(() => alert(`${name} deleted.`)).catch(err => alert(`Error: ${err.message}`));
+            }
+        }
+    </script>
+</body>
+</html>

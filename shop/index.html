@@ -290,7 +290,15 @@
                 currentUserProfile = null;
             }
             updateMenu();
-            renderProducts(allProducts); // Re-render products to update bookmark status
+            
+            // --- FIX STARTS HERE ---
+            // This now only re-renders the product list if the products have already been loaded once.
+            // This prevents the double-render on initial page load.
+            if (Object.keys(allProducts).length > 0) {
+                renderProducts(allProducts);
+            }
+            // --- FIX ENDS HERE ---
+
             renderMemberships();
         });
 
@@ -389,15 +397,13 @@
             showSlide(currentSlide); startSlideShow();
         }
 
-        // --- FIX STARTS HERE ---
-        // This function now fetches products and immediately calls renderProducts.
         function fetchProducts() {
             onValue(ref(db, 'products'), snap => {
                 allProducts = snap.val() || {};
+                // This function is now responsible for the initial render and any real-time updates to products.
                 renderProducts(allProducts);
             });
         }
-        // --- FIX ENDS HERE ---
 
         async function renderProducts(products) {
             productGrid.innerHTML = ''; 

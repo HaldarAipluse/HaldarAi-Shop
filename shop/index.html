@@ -290,17 +290,36 @@
                 currentUserProfile = null;
             }
             updateMenu();
-            
             // --- FIX STARTS HERE ---
-            // This now only re-renders the product list if the products have already been loaded once.
-            // This prevents the double-render on initial page load.
-            if (Object.keys(allProducts).length > 0) {
-                renderProducts(allProducts);
-            }
+            // Instead of re-rendering the whole product list, just update the bookmark icons.
+            // This is more efficient and prevents the duplication issue.
+            updateUserBookmarkStatus();
             // --- FIX ENDS HERE ---
-
             renderMemberships();
         });
+        
+        // --- NEW FUNCTION TO UPDATE BOOKMARKS WITHOUT RE-RENDERING ---
+        async function updateUserBookmarkStatus() {
+            let userBookmarks = {};
+            if (currentUser) {
+                const snap = await get(ref(db, `users/${currentUser.uid}/bookmarks`));
+                if (snap.exists()) {
+                    userBookmarks = snap.val();
+                }
+            }
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                const productId = card.dataset.id;
+                const icon = card.querySelector('.bookmark-icon');
+                if (icon) {
+                    if (userBookmarks[productId]) {
+                        icon.classList.add('bookmarked');
+                    } else {
+                        icon.classList.remove('bookmarked');
+                    }
+                }
+            });
+        }
 
         async function updateMenu() {
             const menuUserInfo = document.getElementById('menu-user-info'), menuLinks = document.getElementById('menu-links');
@@ -400,7 +419,6 @@
         function fetchProducts() {
             onValue(ref(db, 'products'), snap => {
                 allProducts = snap.val() || {};
-                // This function is now responsible for the initial render and any real-time updates to products.
                 renderProducts(allProducts);
             });
         }

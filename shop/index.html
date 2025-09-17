@@ -256,7 +256,6 @@
         
         let allProducts = {}, currentUser = null, currentProduct = null, authMode = 'login', sitePolicies = {}, siteMemberships = {}, currentUserProfile = null;
         let currentSlide = 0, slideInterval, isDragging = false, startPos = 0, currentTranslate = 0, prevTranslate = 0;
-        let isInitialProductLoad = true;
         
         const hamburgerBtn = document.getElementById('hamburger-btn'), slideMenu = document.getElementById('slide-menu');
         const productGrid = document.getElementById('product-grid'), views = document.querySelectorAll('.content-view');
@@ -275,7 +274,11 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme(localStorage.getItem('theme') || 'light');
-            fetchBanners(); fetchProducts(); fetchPolicies(); fetchMemberships(); setupEventListeners();
+            fetchBanners(); 
+            fetchProducts(); 
+            fetchPolicies(); 
+            fetchMemberships(); 
+            setupEventListeners();
         });
 
         onAuthStateChanged(auth, async (user) => {
@@ -287,7 +290,7 @@
                 currentUserProfile = null;
             }
             updateMenu();
-            renderProducts(allProducts);
+            renderProducts(allProducts); // Re-render products to update bookmark status
             renderMemberships();
         });
 
@@ -386,19 +389,23 @@
             showSlide(currentSlide); startSlideShow();
         }
 
+        // --- FIX STARTS HERE ---
+        // This function now fetches products and immediately calls renderProducts.
         function fetchProducts() {
             onValue(ref(db, 'products'), snap => {
                 allProducts = snap.val() || {};
-                // FIX: Only render on subsequent updates, not the initial one.
-                if (isInitialProductLoad) {
-                    isInitialProductLoad = false;
-                    return;
-                }
                 renderProducts(allProducts);
             });
         }
+        // --- FIX ENDS HERE ---
+
         async function renderProducts(products) {
-            productGrid.innerHTML = ''; let userBookmarks = {};
+            productGrid.innerHTML = ''; 
+            if (!products || Object.keys(products).length === 0) {
+                productGrid.innerHTML = '<p>No products available right now.</p>';
+                return;
+            }
+            let userBookmarks = {};
             if (currentUser) { const snap = await get(ref(db, `users/${currentUser.uid}/bookmarks`)); if (snap.exists()) userBookmarks = snap.val(); }
             for (const [id, product] of Object.entries(products)) {
                 const card = document.createElement('div'); card.className = 'product-card'; card.dataset.id = id; card.dataset.title = product.title.toLowerCase();
